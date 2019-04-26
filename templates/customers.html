@@ -1,0 +1,5 @@
+<ul>
+  {% for customer in customers %}
+    <li><a href="/admin/customer/{{ customer.id }}">{{ customer.name }}</a></li>
+  {% endfor %}
+</ul>

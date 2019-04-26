@@ -1,0 +1,24 @@
+<ul>
+  {% for message in customer.messages %}
+    <li>
+      {{ message.created_at }}
+      {% if message.agent %}
+        {{ message.agent.name }} (Agent):
+      {% else %}
+        {{ message.customer.name }} (Customer):
+      {% endif %}
+      {{  message.body }}
+    </li>
+  {% endfor %}
+</ul>
+
+
+<form action="" method="POST">
+  <textarea name="message">Enter message here...</textarea>
+  <select name="agent">
+    {% for agent in agents %}
+      <option value="{{agent.id}}">{{ agent.name }}</option>
+    {% endfor %}
+  </select>
+  <input type="submit">
+</form>

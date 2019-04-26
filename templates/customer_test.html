@@ -1,0 +1,22 @@
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+
+<form action="" method="POST">
+  <textarea name="message" placeholder="Enter message here…"></textarea>
+  <select name="customer_id">
+    <option value="0">New customer (enter name here -->)</option>
+    {% for customer in customers %}
+      <option value="{{customer.id}}">{{ customer.name }}</option>
+    {% endfor %}
+  </select>
+  <input type="text" name="customer_name" placeholder="Customer name (for new customers)">
+  <input type="submit">
+</form>
