@@ -28,9 +28,12 @@ We assume you have the following installed already:
     return something along the lines of `/usr/local/opt/postgresql/bin/postgres
     -D /usr/local/var/postgres`. If it isn't, follow installation and
     troubleshooting instructions above.
-  * Create the database: `createdb customer-service-messaging`
+  * Create the database: `createdb customer-service-messaging` (depending on how
+    you installed Postgres, the `createdb` tool may not be in your PATH. If you
+    installed Postgres.app, you can point directly at
+    `/Applications/Postgres.app/Contents/Versions/latest/bin/createdb`)
   * Run the setup script: `python init_db_and_populate_with_testdata.py`
-  * Start the server: `FLASK_APP=app.py FLASK_DEBUG=1 flask run`
+  * Start the server: `FLASK_APP=app.py FLASK_DEBUG=1 ./venv/bin/flask run`
   * Navigate to http://localhost:5000/admin/customers to see the agent
   interface.
   * Navigate to http://localhost:5000/customer_test to submit customer messages.
