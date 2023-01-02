@@ -1,24 +1,92 @@
-<ul>
-  {% for message in customer.messages %}
-    <li>
-      {{ message.created_at }}
-      {% if message.agent %}
-        {{ message.agent.name }} (Agent):
-      {% else %}
-        {{ message.customer.name }} (Customer):
-      {% endif %}
-      {{  message.body }}
-    </li>
-  {% endfor %}
-</ul>
-
-
-<form action="" method="POST">
-  <textarea name="message">Enter message here...</textarea>
-  <select name="agent">
-    {% for agent in agents %}
-      <option value="{{agent.id}}">{{ agent.name }}</option>
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FlaskApp</title>
+    <style>
+        .coll {
+            padding: 20px;
+            margin: 10px;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>Send Message</h1>
+    <hr>
+    <div class="content">
+    <form method="post">
+        <p>
+          <b><label for="content">Send message</label></b>
+        </p>
+        <p>
+            <input type="text" name="user_id" placeholder="User_Id"></input>
+        </p>
+        <p>
+          <b><label for="degree">Message</label></b>
+        </p>
+        <textarea name="message">Enter message here...</textarea> -->
+        <!-- <select name="agent">
+          {% for agent in agents %}
+            <option value="{{agent.id}}">{{ agent.name }}</option>
+          {% endfor %}
+        </select> -->
+        <!-- <button type="submit">Submit</button>
+    </form>
+    <hr>
+    {% for coll in colle %}
+        <div class="coll">
+            <p>{{ coll['user_id'] }} <i>({{ coll['Message']}})</i></p>
+        </div>
     {% endfor %}
-  </select>
-  <input type="submit">
-</form>
+    </div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer message platform</title>
+</head>
+<body>
+  <!-- {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %} -->
+  {% for message in messages %}
+    <div class="message">
+      <li>
+        {% if message['agent'] %}
+          {{ message['agent_name'] }} (Agent):
+        {% else %}
+          {{ message['customer_name'] }} (Customer):
+        {% endif %}
+        {{  message['Body'] }}
+      </li>
+    </div>
+  {% endfor %}
+  <hr>
+  <form action="" method="POST">
+    <textarea name="message">Enter message here...</textarea>
+    <br>
+    <br>
+    <select name="customer_id">
+      <option value="0">New customer (enter name here -->)</option>
+      {% for customer in customers %}
+        <option value="{{customer['customer_id']}}">{{ customer['Name'] }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    <br>
+    <input type="submit">
+  </form>
+</body>
+</html>

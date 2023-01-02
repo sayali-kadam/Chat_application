@@ -1,22 +1,51 @@
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-      {% for message in messages %}
-        <li>{{ message }}</li>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer message platform</title>
+</head>
+<body>
+  <!-- {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %} -->
+  <form action="" method="POST">
+    <textarea name="message" placeholder="Enter message here…"></textarea>
+    <br>
+    <br>
+    <select name="Name">
+      <option value="0">Choose your agent....</option>
+      {% for agent in agents %}
+        <option value="{{agent['agent_id']}}">{{ agent['Name'] }}</option>
       {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+    </select>
+    <br>
+    <br>
+    <input type="text" name="customer_name" placeholder="Customer name (for new customers)">
+    <br>
+    <br>
+    <input type="submit">
+  </form>
+  <hr>
+  {% for message in messages %}
+    <div class="message">
+      <li>
+        {% if message['agent'] %}
+          {{ message['agent_name'] }} (Agent):
+        {% else %}
+          {{ message['customer_name'] }} (Customer):
+        {% endif %}
+        {{  message['Body'] }}
+      </li>
+    </div>
+  {% endfor %}
+</body>
+</html>
 
-
-<form action="" method="POST">
-  <textarea name="message" placeholder="Enter message here…"></textarea>
-  <select name="customer_id">
-    <option value="0">New customer (enter name here -->)</option>
-    {% for customer in customers %}
-      <option value="{{customer.id}}">{{ customer.name }}</option>
-    {% endfor %}
-  </select>
-  <input type="text" name="customer_name" placeholder="Customer name (for new customers)">
-  <input type="submit">
-</form>

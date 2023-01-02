@@ -1,114 +1,106 @@
-from flask import Flask, render_template, abort, request, flash
-from flask_sqlalchemy import SQLAlchemy
-
-from datetime import datetime
-
-from config import Config
+from flask import Flask, request, render_template, redirect, url_for
+import pymongo
 
 app = Flask(__name__)
-app.config.from_object(Config)
-
-db = SQLAlchemy(app)
-
-
-class Customer(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
-
-    created_at = db.Column(db.DateTime(timezone=True), index=True,
-                           default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime(timezone=True), index=True,
-                            default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    def __repr__(self):
-        return '<Customer %r>' % self.name
-
-class Agent(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
-
-    created_at = db.Column(db.DateTime(timezone=True), index=True,
-                           default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime(timezone=True), index=True,
-                            default=datetime.utcnow, onupdate=datetime.utcnow)
-
-
-    def __repr__(self):
-        return '<Agent %r>' % self.name
-
-
-class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    # Every message is associated with a single customer.
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'),
-                            nullable=False)
-    customer = db.relationship('Customer',
-        backref=db.backref('messages', lazy=True))
-
-    # This is only set if the message was sent by the agent. For messages sent
-    # by the customer, it is NULL.
-    agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'), nullable=True)
-    agent = db.relationship('Agent',
-                            backref=db.backref('messages', lazy=True))
-
-
-    body = db.Column(db.String, nullable=False)
-
-    created_at = db.Column(db.DateTime(timezone=True), index=True,
-                           default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime(timezone=True), index=True,
-                            default=datetime.utcnow, onupdate=datetime.utcnow)
-
-
+count_cust = 1
+count_agent = 1
+CONNECTION_STRING = "mongodb+srv://Sayali:sayali@cluster0.d5uvhoq.mongodb.net/?retryWrites=true&w=majority"
+client = pymongo.MongoClient(CONNECTION_STRING)
+db = client.get_database('internship_project')
+colle = db["customerList"]
 
 @app.route('/')
-def index():
-    return 'Hello World'
-
-
-@app.route('/customer_test', methods=['GET', 'POST'])
-def customer_test():
-    customers = Customer.query.all()
-
-    if request.method == 'POST':
-        msg_body = request.form.get('message')
-        customer_id = int(request.form.get('customer_id', 0))
-        customer_name = request.form.get('customer_name')
-
-        if customer_id:
-            customer = Customer.query.get(customer_id)
-        else:
-            customer = Customer(name=customer_name)
-            db.session.add(customer)
-
-        msg = Message(customer=customer, body=msg_body)
-        db.session.add(msg)
-        db.session.commit()
-        flash('Sent message "%s" for customer %s (id %d)' % (
-            msg_body, customer.name, customer.id))
-
-
-    return render_template('customer_test.html', customers=customers)
-
+def flask_mongodb_atlas():
+    return "flask mongodb atlas!"
 
 @app.route('/admin/customers')
 def view_customers():
-    customers = Customer.query.all()
-    return render_template('customers.html', customers=customers)
+    all_todos = db["customerList"].find()
+    results = list(all_todos)
+    if len(results)==0:
+        print("Empty Cursor")
+    else:
+        print("Cursor is Not Empty")
+        print(results)
+    return render_template('customers.html', colle=results)
+
+@app.route('/customer_dashboad', methods=['GET', 'POST'])
+def customer_dashboard():
+    customers = db["customerList"].find()
+    customer = list(customers)
+
+    if request.method == 'POST':
+        customer_id = request.form['customer_id']
+        url = '/customer_test/'+customer_id
+        return redirect(url)
+
+    return render_template('customer_dashboard.html', colle=customer)
+
+@app.route('/add_customer', methods=['GET', 'POST'])
+def add_customer():
+    global count_cust
+    if request.method == 'POST':
+        customer_name = request.form['customer_name']
+        url = '/customer_test/'+str(count_cust)
+        db.customerList.insert_one({"customer_id": count_cust, 'Name': customer_name})
+        count_cust = count_cust+1
+        return redirect(url)
+
+    return render_template('add_customer.html', colle=customer)
+
+@app.route('/customer_test/<id>', methods=['GET', 'POST'])
+def customer_test(id):
+    customers = list(db["customerList"].find())
+    agents = list(db["agentList"].find())
+    messages = list(db["messsageList"].find({"customer_id": int(id)}))
+    global count_cust
+
+    if request.method == 'POST':
+        msg_body = request.form['message']
+        customer_id = int(request.form.get('customer_id', 0))
+        customer_name = request.form.get('customer_name')
+        
+        if customer_id:
+            print(customer_id)
+        else:
+            db.customerList.insert_one({"customer_id": count_cust, 'Name': customer_name})
+            customer_id = count_cust
+            count_cust = count_cust+1
+
+        db.messsageList.insert_one({'customer_id': customer_id, 'customer_name': customer_name, 'Body': msg_body})
+    
+    if len(messages)==0:
+        print("Empty Cursor")
+    else:
+        print("Cursor is Not Empty")
+        print(messages)
+    return render_template('customer_test.html', messages=messages, agents=agents, customers=customers)
 
 @app.route('/admin/customer/<int:id>', methods=['GET', 'POST'])
 def view_customer(id):
-    customer = Customer.query.get(id)
-    agents = Agent.query.all()
-
+    customer = []
+    for x in db["customerList"].find({"customer_id": id}):
+        customer.append(x['customer_id'])
+        customer.append(x['Name'])
+    
+    agents = list(db["agentList"].find())
+    customers = list(db["customerList"].find())
+    messages = list(db["messsageList"].find({"customer_id": id}))
+    
     if request.method == 'POST':
-        msg_body = request.form.get('message')
-        agent_id = int(request.form.get('agent'))
-        agent = Agent.query.get(agent_id)
-        msg = Message(customer=customer, agent=agent, body=msg_body)
-        db.session.add(msg)
-        db.session.commit()
+        msg_body = request.form['message']
+        agent_id = int(request.form.get('agent_id', 0))
+        print(agent_id)
+        agent = []
+        for x in db["agentList"].find({"agent_id": str(agent_id)}):
+            agent.append(x['agent_id'])
+            agent.append(x['Name'])
+            print(x)
+        print(agent)
+        db.messsageList.insert_one({'customer_id': customer[0], 'customer_name': customer[1], 'agent_id': agent[0], 'agent_name': agent[1], 'Body': msg_body})
+    
+    print(customer)
+    return render_template('customer.html', customers=customers, agents=agents, messages=messages)
 
-
-    return render_template('customer.html', customer=customer,
-                           agents=agents)
+if __name__ == '__main__':
+    app.run(port=8000)
