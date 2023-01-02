@@ -12,16 +12,35 @@
             margin: 10px;
             background-color: #eee;
         }
+        .container {
+            padding: auto;
+            margin: auto;
+            margin-left: 35%;
+            margin-top: 10%;
+        }
+        .input_field {
+            width: 40%;
+            line-height: 40px;
+        }
+        .submit_btn {
+            background-color: rgb(55, 162, 75);
+            line-height: 35px;
+            width: 13%;
+            border-radius: 5%;
+            border-color: rgb(55, 162, 75);
+        }
     </style>
 </head>
 <body>
     <h1 class="header">Welcome</h1>
     <hr>
-    <h4>If you have raised query before then please enter your details below: </h4>
-    <form action="" method="POST">
-        <input type="text" name="customer_id" placeholder="Enter your cunstomer ID">
-        <input type="submit">
-    </form>
-    <h4>If you want to start new conversation then <a href="/add_customer">Click here</a></h4>
+    <div class="container">
+        <h4>If you have raised query before then please enter your details below: </h4>
+        <form action="" method="POST">
+            <input class="input_field" type="text" name="customer_id" placeholder="Enter your cunstomer ID">
+            <input class="submit_btn"type="submit">
+        </form>
+        <h4>If you want to start new conversation then <a href="/add_customer">Click here</a></h4>
+    </div>
 </body>
 </html>

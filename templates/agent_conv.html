@@ -50,17 +50,34 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Customer message platform</title>
+  <style>
+    form {
+      width: 50%;
+      border: 2px solid #000;
+      padding: 30px;
+      margin: 50px auto;
+      background-color: #eee;
+      border-radius: 1%;
+    }
+    textarea {
+      line-height: 50px;
+      width: 90%;
+    }
+    select {
+      width: 90%;
+      height: 30px;
+    }
+    .submit_btn {
+      background-color: rgb(55, 162, 75);
+      line-height: 35px;
+            width: 13%;
+            border-radius: 5%;
+            border-color: rgb(55, 162, 75);
+      margin-left: 40%;
+    }
+  </style>
 </head>
 <body>
-  <!-- {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %} -->
   {% for message in messages %}
     <div class="message">
       <li>
@@ -86,7 +103,7 @@
     </select>
     <br>
     <br>
-    <input type="submit">
+    <input class="submit_btn" type="submit">
   </form>
 </body>
 </html>

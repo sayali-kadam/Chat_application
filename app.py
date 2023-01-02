@@ -13,7 +13,7 @@ colle = db["customerList"]
 def flask_mongodb_atlas():
     return "flask mongodb atlas!"
 
-@app.route('/admin/customers')
+@app.route('/admin/agent_dashboard')
 def view_customers():
     all_todos = db["customerList"].find()
     results = list(all_todos)
@@ -22,16 +22,16 @@ def view_customers():
     else:
         print("Cursor is Not Empty")
         print(results)
-    return render_template('customers.html', colle=results)
+    return render_template('agent_dashboard.html', colle=results)
 
-@app.route('/customer_dashboad', methods=['GET', 'POST'])
+@app.route('/customer_dashboard', methods=['GET', 'POST'])
 def customer_dashboard():
     customers = db["customerList"].find()
     customer = list(customers)
 
     if request.method == 'POST':
         customer_id = request.form['customer_id']
-        url = '/customer_test/'+customer_id
+        url = '/customer_conv/'+customer_id
         return redirect(url)
 
     return render_template('customer_dashboard.html', colle=customer)
@@ -41,15 +41,15 @@ def add_customer():
     global count_cust
     if request.method == 'POST':
         customer_name = request.form['customer_name']
-        url = '/customer_test/'+str(count_cust)
+        url = '/customer_conv/'+str(count_cust)
         db.customerList.insert_one({"customer_id": count_cust, 'Name': customer_name})
         count_cust = count_cust+1
         return redirect(url)
 
-    return render_template('add_customer.html', colle=customer)
+    return render_template('add_customer.html')
 
-@app.route('/customer_test/<id>', methods=['GET', 'POST'])
-def customer_test(id):
+@app.route('/customer_conv/<id>', methods=['GET', 'POST'])
+def customer_conv(id):
     customers = list(db["customerList"].find())
     agents = list(db["agentList"].find())
     messages = list(db["messsageList"].find({"customer_id": int(id)}))
@@ -74,9 +74,9 @@ def customer_test(id):
     else:
         print("Cursor is Not Empty")
         print(messages)
-    return render_template('customer_test.html', messages=messages, agents=agents, customers=customers)
+    return render_template('customer_conv.html', messages=messages, agents=agents, customers=customers)
 
-@app.route('/admin/customer/<int:id>', methods=['GET', 'POST'])
+@app.route('/admin/agent_conv/<int:id>', methods=['GET', 'POST'])
 def view_customer(id):
     customer = []
     for x in db["customerList"].find({"customer_id": id}):
@@ -100,7 +100,7 @@ def view_customer(id):
         db.messsageList.insert_one({'customer_id': customer[0], 'customer_name': customer[1], 'agent_id': agent[0], 'agent_name': agent[1], 'Body': msg_body})
     
     print(customer)
-    return render_template('customer.html', customers=customers, agents=agents, messages=messages)
+    return render_template('agent_conv.html', customers=customers, agents=agents, messages=messages)
 
 if __name__ == '__main__':
     app.run(port=8000)
