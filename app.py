@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, flash
 import pymongo
 
 app = Flask(__name__)
@@ -53,21 +53,13 @@ def customer_conv(id):
     customers = list(db["customerList"].find())
     agents = list(db["agentList"].find())
     messages = list(db["messsageList"].find({"customer_id": int(id)}))
-    global count_cust
-
+   
     if request.method == 'POST':
         msg_body = request.form['message']
-        customer_id = int(request.form.get('customer_id', 0))
+        agent_id = int(request.form.get('agent_id', 0))
         customer_name = request.form.get('customer_name')
-        
-        if customer_id:
-            print(customer_id)
-        else:
-            db.customerList.insert_one({"customer_id": count_cust, 'Name': customer_name})
-            customer_id = count_cust
-            count_cust = count_cust+1
-
-        db.messsageList.insert_one({'customer_id': customer_id, 'customer_name': customer_name, 'Body': msg_body})
+        print(agent_id)
+        db.messsageList.insert_one({'customer_id': int(id), 'customer_name': customer_name, 'Body': msg_body})
     
     if len(messages)==0:
         print("Empty Cursor")
